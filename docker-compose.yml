@@ -19,5 +19,18 @@ services:
       - DOCKER_GROUP_ID=0
     restart: unless-stopped
 
+  app:
+    build:
+      context: ./2fa-nodejs
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "file:./prisma/dev.db"
+    volumes:
+      - ./2fa-nodejs:/app
+      - /app/node_modules
+    command: yarn start
+
 volumes:
   jenkins_data:
