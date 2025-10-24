@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/wpcodevo/2fa-nodejs.git'
+                git 'https://github.com/Adrian25450/proyecto-segundo-corte.git'
             }
         }
 
