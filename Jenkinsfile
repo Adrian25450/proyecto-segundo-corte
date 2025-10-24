@@ -2,10 +2,9 @@ pipeline {
     agent any
 
     environment {
-        // Define variables for Docker Hub
-        DOCKERHUB_USERNAME = 'adrian0526' 
-        DOCKERHUB_TOKEN = credentials('dockerhub-token') 
-        IMAGE_NAME = 'segundocorte-app'
+        DOCKERHUB_USERNAME = 'adrian0526'
+        DOCKERHUB_CREDENTIALS = credentials('docker-hub-creds')
+        IMAGE_NAME = 'proyecto-segundo-corte'
     }
 
     stages {
@@ -18,10 +17,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image using docker-compose
-                    sh "docker-compose build"
-                    // Tag the image for Docker Hub
-                    sh "docker tag 2fa-nodejs_app ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_NUMBER}"
+                    // Construye la imagen directamente con Dockerfile
+                    sh "docker build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_NUMBER} ."
                 }
             }
         }
@@ -29,8 +26,7 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 script {
-                    // Login to Docker Hub using credentials
-                    sh "echo ${DOCKERHUB_TOKEN} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
+                    sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
                 }
             }
         }
@@ -38,7 +34,6 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    // Push the Docker image to Docker Hub
                     sh "docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_NUMBER}"
                 }
             }
@@ -47,10 +42,7 @@ pipeline {
         stage('Clean Up') {
             steps {
                 script {
-                    // Remove the Docker image locally after pushing
-                    sh "docker rmi ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_NUMBER}"
-                    // Remove docker-compose created images
-                    sh "docker-compose down --rmi all"
+                    sh "docker rmi ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_NUMBER} || true"
                 }
             }
         }
