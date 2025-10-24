@@ -11,8 +11,8 @@ services:
       - "50000:50000"
     volumes:
       - jenkins_data:/var/jenkins_home
-      - //var/run/docker.sock:/var/run/docker.sock   # 🔹 Clave: así sí funciona en Docker Desktop (Windows)
-      - /usr/bin/docker:/usr/bin/docker              # Para que Jenkins use el cliente Docker
+      - //var/run/docker.sock:/var/run/docker.sock     # ✅ Correcto para Docker Desktop en Windows
+      - /usr/bin/docker:/usr/bin/docker                # Jenkins podrá usar el cliente Docker
       - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
@@ -21,15 +21,14 @@ services:
 
   app:
     build:
-      context: ./2fa-nodejs
+      context: .                 # ✅ el Dockerfile está en la raíz del proyecto
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
       DATABASE_URL: "file:./prisma/dev.db"
     volumes:
-      - ./2fa-nodejs:/app
-      - /app/node_modules
+      - ./2fa-nodejs:/app        # Monta solo el código fuente
     command: yarn start
 
 volumes:

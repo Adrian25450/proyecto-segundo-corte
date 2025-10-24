@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USERNAME = 'adrian0526'
-        DOCKERHUB_CREDENTIALS = credentials('docker-hub-creds')
+        DOCKERHUB_USERNAME = 'adrian0526'                          // 👈 tu usuario Docker Hub
+        DOCKERHUB_CREDENTIALS = credentials('docker-hub-creds')    // 👈 ID de las credenciales en Jenkins
         IMAGE_NAME = 'proyecto-segundo-corte'
     }
 
@@ -17,8 +17,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Construye la imagen de la aplicación especificando el Dockerfile y el contexto
-                    sh "docker build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_NUMBER} -f ./2fa-nodejs/Dockerfile ./2fa-nodejs"
+                    sh "docker build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_NUMBER} ."
                 }
             }
         }
@@ -45,6 +44,15 @@ pipeline {
                     sh "docker rmi ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_NUMBER} || true"
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline completado exitosamente. Imagen subida a Docker Hub."
+        }
+        failure {
+            echo "❌ Hubo un error durante la ejecución del pipeline."
         }
     }
 }
