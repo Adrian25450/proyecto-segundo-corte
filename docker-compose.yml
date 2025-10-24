@@ -12,12 +12,14 @@ services:
     volumes:
       - jenkins_data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock # Monta el socket de Docker del host
-      - /usr/bin/docker:/usr/bin/docker # Para que Jenkins pueda usar el cliente Docker del host
-      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose # Para que Jenkins pueda usar docker-compose del host
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - DOCKER_GROUP_ID=0 # ⚠️ Verifica que este GID coincida con el grupo 'docker' en tu host (ej. 'getent group docker' en Linux)
+      - DOCKER_GID=999 # ⚠️ IMPORTANTE: Reemplaza '999' con el GID del grupo 'docker' en tu máquina host. Puedes obtenerlo con 'getent group docker' en Linux o 'Get-LocalGroup -Name docker | Select-Object SID' en PowerShell (Windows)
     restart: unless-stopped
+    command: >
+      bash -c "apt-get update && apt-get install -y docker.io docker-compose &&
+      groupadd -g $DOCKER_GID docker || true && usermod -a -G docker jenkins &&
+      exec /usr/bin/tini -- /usr/local/bin/jenkins.sh"
 
   app:
     build:
