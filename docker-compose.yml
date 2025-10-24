@@ -11,17 +11,19 @@ services:
       - "50000:50000"
     volumes:
       - jenkins_data:/var/jenkins_home
-      - //var/run/docker.sock:/var/run/docker.sock     # ✅ Correcto para Docker Desktop en Windows
-      - /usr/bin/docker:/usr/bin/docker                # Jenkins podrá usar el cliente Docker
-      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
+      - /var/run/docker.sock:/var/run/docker.sock # Monta el socket de Docker del host
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - DOCKER_GROUP_ID=0
+      - DOCKER_GROUP_ID=0 # Asegúrate de que este GID coincida con el grupo 'docker' en tu host si no usas 'privileged: true'
     restart: unless-stopped
+    command: >
+      bash -c "apt-get update &&
+      apt-get install -y docker.io docker-compose &&
+      exec /usr/bin/tini -- /usr/local/bin/jenkins.sh"
 
   app:
     build:
-      context: .                 # ✅ el Dockerfile está en la raíz del proyecto
+      context: ./2fa-nodejs
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
