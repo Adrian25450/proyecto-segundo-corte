@@ -11,11 +11,12 @@ services:
       - "50000:50000"
     volumes:
       - jenkins_data:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/bin/docker:/usr/bin/docker # Para que Jenkins pueda usar el cliente Docker
-      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose # Para que Jenkins pueda usar docker-compose
+      - //var/run/docker.sock:/var/run/docker.sock   # 🔹 Clave: así sí funciona en Docker Desktop (Windows)
+      - /usr/bin/docker:/usr/bin/docker              # Para que Jenkins use el cliente Docker
+      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
+      - DOCKER_GROUP_ID=0
     restart: unless-stopped
 
 volumes:
