@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Adrian25450/proyecto-segundo-corte.git'
+                git branch: 'main', url: 'https://github.com/Adrian25450/proyecto-segundo-corte.git'
             }
         }
 
