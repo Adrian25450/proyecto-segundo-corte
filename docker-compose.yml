@@ -4,23 +4,21 @@ services:
   jenkins:
     image: jenkins/jenkins:lts
     container_name: jenkins_segundocorte
+    user: root
     privileged: true
-    user: root # Volver a root para maximizar permisos
     ports:
       - "8080:8080"
       - "50000:50000"
+    environment:
+      - DOCKER_GROUP_ID=999
+      - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
       - jenkins_data:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock # Monta el socket de Docker del host
-      - /usr/bin/docker:/usr/bin/docker # Monta el binario docker del host
-      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose # Monta el binario docker-compose del host
-    environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock
-      - DOCKER_GID=0 # Usar GID 0 para root, o el GID del grupo docker del host
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
+      - /etc/group:/etc/group:ro  # 💥 esto es lo que da acceso real al socket
     restart: unless-stopped
-    # No se necesita 'command' para instalar Docker si se montan los binarios del host.
-    # La imagen 'jenkins/jenkins:lts' ya tiene el cliente Docker preinstalado.
-    # Solo necesitamos asegurar que el usuario 'root' tenga acceso al socket y a los binarios.
 
   app:
     build:
@@ -31,7 +29,7 @@ services:
     environment:
       DATABASE_URL: "file:./prisma/dev.db"
     volumes:
-      - ./2fa-nodejs:/app        # Monta solo el código fuente
+      - ./2fa-nodejs:/app
     command: node dist/server.js
 
 volumes:

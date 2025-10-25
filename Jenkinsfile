@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USERNAME = 'adrian0526'                          // 👈 tu usuario Docker Hub
-        DOCKERHUB_CREDENTIALS = credentials('docker-hub-creds')    // 👈 ID de las credenciales en Jenkins
+        DOCKERHUB_USERNAME = 'adrian0526'
+        DOCKERHUB_CREDENTIALS = credentials('docker-hub-creds')
         IMAGE_NAME = 'proyecto-segundo-corte'
     }
 
@@ -20,9 +20,8 @@ pipeline {
                     sh "whoami"
                     sh "groups"
                     sh "echo $PATH"
-                    sh "ls -l /usr/bin/docker" # Verificar permisos del binario docker
-                    sh "ls -l /var/run/docker.sock" # Verificar permisos del socket docker
-                    // Construye la imagen de la aplicación especificando el Dockerfile y el contexto
+                    sh "ls -l /usr/bin/docker" // Verificar permisos del binario docker
+                    sh "ls -l /var/run/docker.sock" // Verificar permisos del socket docker
                     sh "sh -c '/usr/bin/docker build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_NUMBER} -f ./2fa-nodejs/Dockerfile ./2fa-nodejs'"
                 }
             }
