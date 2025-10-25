@@ -5,20 +5,22 @@ services:
     image: jenkins/jenkins:lts
     container_name: jenkins_segundocorte
     privileged: true
-    user: jenkins # Cambiar a usuario 'jenkins' por defecto
+    user: root # Volver a root para maximizar permisos
     ports:
       - "8080:8080"
       - "50000:50000"
     volumes:
       - jenkins_data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock # Monta el socket de Docker del host
+      - /usr/bin/docker:/usr/bin/docker # Monta el binario docker del host
+      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose # Monta el binario docker-compose del host
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - DOCKER_GID=999 # ⚠️ IMPORTANTE: Reemplaza '999' con el GID del grupo 'docker' en tu máquina host. Puedes obtenerlo con 'getent group docker' en Linux o 'Get-LocalGroup -Name docker | Select-Object SID' en PowerShell (Windows)
+      - DOCKER_GID=0 # Usar GID 0 para root, o el GID del grupo docker del host
     restart: unless-stopped
-    # No se necesita 'command' si la imagen de Jenkins ya tiene Docker o si se monta el cliente del host.
+    # No se necesita 'command' para instalar Docker si se montan los binarios del host.
     # La imagen 'jenkins/jenkins:lts' ya tiene el cliente Docker preinstalado.
-    # Solo necesitamos asegurar que el usuario 'jenkins' tenga acceso al socket.
+    # Solo necesitamos asegurar que el usuario 'root' tenga acceso al socket y a los binarios.
 
   app:
     build:
@@ -30,7 +32,7 @@ services:
       DATABASE_URL: "file:./prisma/dev.db"
     volumes:
       - ./2fa-nodejs:/app        # Monta solo el código fuente
-    command: yarn start
+    command: node dist/server.js
 
 volumes:
   jenkins_data:

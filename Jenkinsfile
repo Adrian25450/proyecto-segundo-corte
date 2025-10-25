@@ -20,8 +20,10 @@ pipeline {
                     sh "whoami"
                     sh "groups"
                     sh "echo $PATH"
+                    sh "ls -l /usr/bin/docker" # Verificar permisos del binario docker
+                    sh "ls -l /var/run/docker.sock" # Verificar permisos del socket docker
                     // Construye la imagen de la aplicación especificando el Dockerfile y el contexto
-                    sh "/usr/bin/docker build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_NUMBER} -f ./2fa-nodejs/Dockerfile ./2fa-nodejs"
+                    sh "sh -c '/usr/bin/docker build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_NUMBER} -f ./2fa-nodejs/Dockerfile ./2fa-nodejs'"
                 }
             }
         }
