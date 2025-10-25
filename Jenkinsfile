@@ -17,6 +17,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    sh "whoami"
+                    sh "groups"
+                    sh "echo $PATH"
                     // Construye la imagen de la aplicación especificando el Dockerfile y el contexto
                     sh "/usr/bin/docker build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${BUILD_NUMBER} -f ./2fa-nodejs/Dockerfile ./2fa-nodejs"
                 }

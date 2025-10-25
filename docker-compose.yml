@@ -5,7 +5,7 @@ services:
     image: jenkins/jenkins:lts
     container_name: jenkins_segundocorte
     privileged: true
-    user: root
+    user: jenkins # Cambiar a usuario 'jenkins' por defecto
     ports:
       - "8080:8080"
       - "50000:50000"
@@ -16,10 +16,9 @@ services:
       - DOCKER_HOST=unix:///var/run/docker.sock
       - DOCKER_GID=999 # ⚠️ IMPORTANTE: Reemplaza '999' con el GID del grupo 'docker' en tu máquina host. Puedes obtenerlo con 'getent group docker' en Linux o 'Get-LocalGroup -Name docker | Select-Object SID' en PowerShell (Windows)
     restart: unless-stopped
-    command: >
-      bash -c "apt-get update && apt-get install -y docker.io docker-compose &&
-      groupadd -g $DOCKER_GID docker || true && usermod -a -G docker jenkins &&
-      exec /usr/bin/tini -- /usr/local/bin/jenkins.sh"
+    # No se necesita 'command' si la imagen de Jenkins ya tiene Docker o si se monta el cliente del host.
+    # La imagen 'jenkins/jenkins:lts' ya tiene el cliente Docker preinstalado.
+    # Solo necesitamos asegurar que el usuario 'jenkins' tenga acceso al socket.
 
   app:
     build:
